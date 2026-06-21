@@ -11,6 +11,7 @@ interface FlowArcsProps {
 }
 
 const SOURCE_ID = 'flow-arcs';
+const HALO_LAYER_ID = 'flow-arc-lines-halo';
 const BG_LAYER_ID = 'flow-arc-lines';
 const ANIM_LAYER_ID = 'flow-arc-lines-anim';
 
@@ -26,6 +27,7 @@ export default function FlowArcs({ map, hospitals, proposedLocations, simulation
         if (map?.getStyle()) {
           if (map.getLayer(ANIM_LAYER_ID)) map.removeLayer(ANIM_LAYER_ID);
           if (map.getLayer(BG_LAYER_ID)) map.removeLayer(BG_LAYER_ID);
+          if (map.getLayer(HALO_LAYER_ID)) map.removeLayer(HALO_LAYER_ID);
           if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
         }
       } catch { /* map already destroyed */ }
@@ -66,15 +68,30 @@ export default function FlowArcs({ map, hospitals, proposedLocations, simulation
     } else {
       map.addSource(SOURCE_ID, { type: 'geojson', data: geojson });
 
-      // Faint static background line for context
+      // White halo underneath so the line reads clearly over any basemap
+      // color (this style's roads are blue/green/cyan, same family as a
+      // plain blue line, so without a halo it just blends in).
+      map.addLayer({
+        id: HALO_LAYER_ID,
+        type: 'line',
+        source: SOURCE_ID,
+        layout: { 'line-cap': 'round' },
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': ['interpolate', ['linear'], ['get', 'magnitude'], 0, 5, 8, 10],
+          'line-opacity': 0.85,
+        },
+      });
+
+      // Static background line for context
       map.addLayer({
         id: BG_LAYER_ID,
         type: 'line',
         source: SOURCE_ID,
         paint: {
-          'line-color': '#3b82f6',
-          'line-width': ['interpolate', ['linear'], ['get', 'magnitude'], 0, 1.5, 8, 4],
-          'line-opacity': 0.25,
+          'line-color': '#9333ea',
+          'line-width': ['interpolate', ['linear'], ['get', 'magnitude'], 0, 3, 8, 7],
+          'line-opacity': 0.6,
         },
       });
 
@@ -86,9 +103,9 @@ export default function FlowArcs({ map, hospitals, proposedLocations, simulation
         source: SOURCE_ID,
         layout: { 'line-cap': 'round' },
         paint: {
-          'line-color': '#60a5fa',
-          'line-width': ['interpolate', ['linear'], ['get', 'magnitude'], 0, 2.5, 8, 6],
-          'line-opacity': 0.9,
+          'line-color': '#c026d3',
+          'line-width': ['interpolate', ['linear'], ['get', 'magnitude'], 0, 3, 8, 7],
+          'line-opacity': 1,
           'line-dasharray': [0, 3, 1.4],
         },
       });
@@ -124,6 +141,7 @@ export default function FlowArcs({ map, hospitals, proposedLocations, simulation
         if (map?.getStyle()) {
           if (map.getLayer(ANIM_LAYER_ID)) map.removeLayer(ANIM_LAYER_ID);
           if (map.getLayer(BG_LAYER_ID)) map.removeLayer(BG_LAYER_ID);
+          if (map.getLayer(HALO_LAYER_ID)) map.removeLayer(HALO_LAYER_ID);
           if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
         }
       } catch { /* map already destroyed */ }

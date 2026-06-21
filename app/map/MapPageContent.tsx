@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import ClearPathMap from '@/components/clearpath/ClearPathMap';
 import ModeToggle from '@/components/clearpath/ModeToggle';
+import GovernmentLoginModal from '@/components/clearpath/government/GovernmentLoginModal';
 import DayNightToggle from '@/components/clearpath/DayNightToggle';
 import CitySelector from '@/components/clearpath/CitySelector';
 import GovernmentSidebar from '@/components/clearpath/government/GovernmentSidebar';
@@ -19,6 +20,8 @@ export default function MapPageContent() {
   const searchParams = useSearchParams();
   const initialMode = searchParams.get('mode') === 'government' ? 'government' : searchParams.get('mode') === 'civilian' ? 'civilian' : 'civilian';
   const [mode, setMode] = useState<'government' | 'civilian'>(initialMode);
+  const [govAuthenticated, setGovAuthenticated] = useState(false);
+  const [showGovLogin, setShowGovLogin] = useState(false);
   const [selectedCity, setSelectedCity] = useState<typeof CITIES[0] | null>(null);
   const mapCity = selectedCity ?? CITIES[0];
   const [simulationResult, setSimulationResult] = useState(null);
@@ -105,7 +108,7 @@ export default function MapPageContent() {
     setSelectedCity(city);
   }, []);
 
-  const handleModeChange = useCallback((newMode: 'government' | 'civilian') => {
+  const applyModeChange = useCallback((newMode: 'government' | 'civilian') => {
     setMode(newMode);
     if (newMode === 'government') {
       setRecommendedHospital(null);
@@ -116,6 +119,20 @@ export default function MapPageContent() {
       setSelectedBlueprint(null);
     }
   }, []);
+
+  const handleModeChange = useCallback((newMode: 'government' | 'civilian') => {
+    if (newMode === 'government' && !govAuthenticated) {
+      setShowGovLogin(true);
+      return;
+    }
+    applyModeChange(newMode);
+  }, [govAuthenticated, applyModeChange]);
+
+  const handleGovLoginSuccess = useCallback(() => {
+    setGovAuthenticated(true);
+    setShowGovLogin(false);
+    applyModeChange('government');
+  }, [applyModeChange]);
 
   const handleRecommendation = useCallback((result: any, routeParams?: any) => {
     setRecommendedHospital(result);
@@ -255,6 +272,13 @@ export default function MapPageContent() {
           recommended={activeRec}
           alternatives={recommendedHospital?.alternatives ?? []}
           isRerouting={isRerouting}
+        />
+      )}
+
+      {showGovLogin && (
+        <GovernmentLoginModal
+          onSuccess={handleGovLoginSuccess}
+          onCancel={() => setShowGovLogin(false)}
         />
       )}
     </div>
