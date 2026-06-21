@@ -189,7 +189,15 @@ export default function ClearPathMap({
     map.on('click', (e) => {
       const bp = selectedBlueprintRef.current;
       if (bp && map.getLayer('suitable-parcels-fill')) {
-        const hits = map.queryRenderedFeatures(e.point, { layers: ['suitable-parcels-fill'] });
+        // Tolerate near-misses: the parcels layer is a sparse, 3D-extruded
+        // pattern, so requiring a pixel-exact hit makes placement nearly
+        // unclickable. Accept the click if a parcel is within ~15px.
+        const tolerance = 15;
+        const bbox: [mapboxgl.PointLike, mapboxgl.PointLike] = [
+          [e.point.x - tolerance, e.point.y - tolerance],
+          [e.point.x + tolerance, e.point.y + tolerance],
+        ];
+        const hits = map.queryRenderedFeatures(bbox, { layers: ['suitable-parcels-fill'] });
         if (!hits.length) return;
       }
       onMapClickRef.current?.({ lng: e.lngLat.lng, lat: e.lngLat.lat }, bp ?? null);
@@ -310,7 +318,12 @@ export default function ClearPathMap({
         const lngLat = marker.getLngLat();
         if (selectedBlueprintRef.current && mapRef.current && mapRef.current.getLayer('suitable-parcels-fill')) {
           const pt = mapRef.current.project(lngLat);
-          const hits = mapRef.current.queryRenderedFeatures(pt, { layers: ['suitable-parcels-fill'] });
+          const tolerance = 15;
+          const bbox: [mapboxgl.PointLike, mapboxgl.PointLike] = [
+            [pt.x - tolerance, pt.y - tolerance],
+            [pt.x + tolerance, pt.y + tolerance],
+          ];
+          const hits = mapRef.current.queryRenderedFeatures(bbox, { layers: ['suitable-parcels-fill'] });
           if (!hits.length) {
             const prev = proposedLocations.find((x) => x.id === buildingId);
             if (prev) marker.setLngLat([prev.lng, prev.lat]);
