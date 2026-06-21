@@ -25,7 +25,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const foodBanks = await searchNearbyFoodBanks(userLat, userLng);
+    // Use the same limit as /hospitals and /congestion so they share one
+    // cache entry per location — otherwise each endpoint independently
+    // queries Mapbox's non-deterministic text search and can return a
+    // different subset of real food banks for the same spot.
+    const foodBanks = await searchNearbyFoodBanks(userLat, userLng, { limit: 20 });
 
     if (!foodBanks.length) {
       return NextResponse.json(

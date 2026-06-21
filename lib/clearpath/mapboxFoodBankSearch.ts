@@ -112,6 +112,7 @@ export async function searchNearbyFoodBanks(
   );
 
   const seenCoords = new Set<string>();
+  const seenNames = new Set<string>();
   const candidates: Hospital[] = [];
 
   for (const f of retrieved) {
@@ -121,9 +122,16 @@ export async function searchNearbyFoodBanks(
     const distanceKm = haversineKm(lat, lng, poiLat, poiLng);
     if (distanceKm > radiusKm) continue;
 
+    // Mapbox sometimes lists the same physical food bank twice (e.g. a
+    // duplicate POI entry with a slightly different geocoded entrance),
+    // so also dedupe by name, not just rounded coordinates.
+    const nameKey = f.properties.name.trim().toLowerCase();
+    if (seenNames.has(nameKey)) continue;
+
     const coordKey = `${poiLat.toFixed(3)},${poiLng.toFixed(3)}`;
     if (seenCoords.has(coordKey)) continue;
     seenCoords.add(coordKey);
+    seenNames.add(nameKey);
 
     const id = f.properties.mapbox_id;
     const h = hashString(id);
