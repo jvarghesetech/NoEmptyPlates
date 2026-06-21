@@ -17,7 +17,10 @@ export default function LandmarksLayer({ map }: LandmarksLayerProps) {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    // Don't gate on isStyleLoaded() — with [map] as the only dependency,
+    // a false reading here means this effect never runs again for the
+    // lifetime of this map instance, so the layer silently never appears.
+    if (!map) return;
 
     const beforeLayerId = getFirstSymbolLayerId(map);
     if (!beforeLayerId) return;

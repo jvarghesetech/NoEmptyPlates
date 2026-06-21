@@ -91,11 +91,10 @@ export default function TrafficLayer({ map }: TrafficLayerProps) {
       }
     }
 
-    if (map.isStyleLoaded()) {
-      addTrafficLayers();
-    } else {
-      map.once('style.load', addTrafficLayers);
-    }
+    // Don't gate on isStyleLoaded() — waiting on a one-shot 'style.load'
+    // that may have already fired during initial map setup means
+    // addTrafficLayers() would never run.
+    addTrafficLayers();
 
     return () => {
       if (!map) return;

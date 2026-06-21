@@ -19,7 +19,11 @@ export default function SuitableParcelsLayer({ map, cityId, blueprint }: Suitabl
   const prevKeyRef = useRef('');
 
   useEffect(() => {
-    if (!map || !map.isStyleLoaded()) return;
+    // Don't gate on isStyleLoaded() — it can read false here even though
+    // the style is fully usable, which previously meant this layer (and
+    // thus the ability to click-place a building) silently never appeared
+    // whenever a blueprint was selected while other layers were loading.
+    if (!map) return;
 
     const key = `${cityId}:${blueprint.id}`;
     prevKeyRef.current = key;

@@ -112,11 +112,10 @@ export default function GLBModelLayer({ map, id, glbPath, lngLat, rotation = 0, 
       addedRef.current = true;
     }
 
-    if (map.isStyleLoaded()) {
-      add();
-    } else {
-      map.once('style.load', add);
-    }
+    // Don't gate on isStyleLoaded() — waiting on a one-shot 'style.load'
+    // that may have already fired during initial map setup means add()
+    // would never run.
+    add();
 
     return () => {
       if (!map) return;

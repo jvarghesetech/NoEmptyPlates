@@ -209,11 +209,10 @@ export default function SimulatedTrafficOverlay({
       }
     }
 
-    if (map.isStyleLoaded()) {
-      addSimLayers();
-    } else {
-      map.once('style.load', addSimLayers);
-    }
+    // Don't gate on isStyleLoaded() — waiting on a one-shot 'style.load'
+    // that may have already fired during initial map setup means
+    // addSimLayers() would never run.
+    addSimLayers();
 
     return cleanup;
   }, [map, simulationResult, hospitals, proposedLocations]);

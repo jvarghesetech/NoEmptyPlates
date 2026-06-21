@@ -36,10 +36,10 @@ function getColorForOccupancy(occ: number): string {
 }
 
 function getOpacityForOccupancy(occ: number): number {
-  if (occ < 50) return 0.06;
-  if (occ < 70) return 0.10;
-  if (occ < 85) return 0.16;
-  return 0.20;
+  if (occ < 50) return 0.18;
+  if (occ < 70) return 0.30;
+  if (occ < 85) return 0.42;
+  return 0.55;
 }
 
 export default function HospitalTrafficHeatLayer({
@@ -107,7 +107,7 @@ export default function HospitalTrafficHeatLayer({
 
         // Radius scales with erBeds + occupancy
         const beds = h.erBeds ?? 30;
-        const maxRadiusKm = Math.min(2, Math.max(0.8, 0.8 + (beds / 60) * 0.6 + (occ / 100) * 0.6));
+        const maxRadiusKm = Math.min(3, Math.max(1.2, 1.2 + (beds / 60) * 0.8 + (occ / 100) * 0.8));
 
         for (let rIdx = rings.length - 1; rIdx >= 0; rIdx--) {
           const ring = rings[rIdx];
@@ -146,7 +146,7 @@ export default function HospitalTrafficHeatLayer({
           const color = getColorForOccupancy(occ);
           const baseOpacity = getOpacityForOccupancy(occ);
           const beds = p.erBeds ?? 30;
-          const maxRadiusKm = Math.min(2, Math.max(0.8, 0.8 + (beds / 60) * 0.6 + (occ / 100) * 0.6));
+          const maxRadiusKm = Math.min(3, Math.max(1.2, 1.2 + (beds / 60) * 0.8 + (occ / 100) * 0.8));
 
           for (let rIdx = rings.length - 1; rIdx >= 0; rIdx--) {
             const ring = rings[rIdx];
@@ -177,11 +177,11 @@ export default function HospitalTrafficHeatLayer({
       }
     }
 
-    if (map.isStyleLoaded()) {
-      addLayers();
-    } else {
-      map.once('style.load', addLayers);
-    }
+    // Don't gate on isStyleLoaded() — it can read false here even though
+    // the style is fully usable (other layers add/remove around the same
+    // time), and waiting on a one-shot 'style.load' that already fired
+    // during initial map setup means addLayers() would never run.
+    addLayers();
 
     return cleanup;
   }, [map, hospitals, congestion, simulationResult, proposedLocations]);
