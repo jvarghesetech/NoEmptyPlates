@@ -74,6 +74,31 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
       data: { type: 'FeatureCollection', features }
     });
 
+    // Outer red "demand" ring — sized by occupancy, animates smoothly when
+    // simulation results change (Mapbox transitions interpolate paint
+    // property changes over time instead of snapping instantly).
+    map.addLayer({
+      id: 'hospital-demand-ring',
+      type: 'circle',
+      source: sourceId,
+      paint: {
+        'circle-radius': [
+          'interpolate', ['linear'], ['get', 'occupancyPct'],
+          0, 20,
+          100, 70
+        ],
+        'circle-radius-transition': { duration: 900, delay: 0 },
+        'circle-color': '#ef4444',
+        'circle-opacity': [
+          'interpolate', ['linear'], ['get', 'occupancyPct'],
+          0, 0.12,
+          100, 0.55
+        ],
+        'circle-opacity-transition': { duration: 900, delay: 0 },
+        'circle-blur': 0.6
+      }
+    });
+
     map.addLayer({
       id: layerId,
       type: 'circle',
@@ -84,6 +109,7 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
           0, 12,
           100, 30
         ],
+        'circle-radius-transition': { duration: 900, delay: 0 },
         'circle-color': [
           'interpolate', ['linear'], ['get', 'occupancyPct'],
           0, '#22c55e',
@@ -91,6 +117,7 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
           75, '#f97316',
           100, '#dc2626'
         ],
+        'circle-color-transition': { duration: 900, delay: 0 },
         'circle-opacity': 0.7,
         'circle-stroke-width': 2,
         'circle-stroke-color': '#ffffff'
@@ -160,6 +187,7 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
         if (map && map.getStyle()) {
           if (map.getLayer('hospital-labels')) map.removeLayer('hospital-labels');
           if (map.getLayer(layerId)) map.removeLayer(layerId);
+          if (map.getLayer('hospital-demand-ring')) map.removeLayer('hospital-demand-ring');
           if (map.getSource(sourceId)) map.removeSource(sourceId);
         }
       } catch {

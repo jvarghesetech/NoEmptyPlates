@@ -7,13 +7,13 @@ export interface ProposedBuilding {
 }
 
 export interface BlueprintMetadata {
-  erBeds: number;
-  operatingRooms: number;
-  traumaRooms: number;
-  ambulances: number;
-  rooms: number;
-  doctors: number;
-  nurses: number;
+  distributionCounters: number;
+  coldStorageUnits: number;
+  intakeRooms: number;
+  deliveryVans: number;
+  storageRooms: number;
+  coordinators: number;
+  volunteers: number;
   numberOfFloors: number;
   totalFloorArea: number;
   groundFloorArea: number;
@@ -27,7 +27,7 @@ export interface Blueprint {
   beds: number;
   /** Minimum parcel area in m² for this blueprint to fit */
   minAreaM2: number;
-  /** Detailed hospital metadata from the editor */
+  /** Detailed food bank metadata from the editor */
   metadata?: BlueprintMetadata;
 }
 
@@ -41,38 +41,37 @@ export function createBlueprintFromBuilding(building: {
   publicPath: string;
   metadata?: {
     groundFloorArea?: number;
-    erBeds?: number;
-    operatingRooms?: number;
-    traumaRooms?: number;
-    ambulances?: number;
-    rooms?: number;
-    doctors?: number;
-    nurses?: number;
+    distributionCounters?: number;
+    coldStorageUnits?: number;
+    intakeRooms?: number;
+    deliveryVans?: number;
+    storageRooms?: number;
+    coordinators?: number;
+    volunteers?: number;
     numberOfFloors?: number;
     totalFloorArea?: number;
-    totalBeds?: number;
+    totalPallets?: number;
   } | null;
 }): Blueprint {
   const m = building.metadata;
   return {
     id: `custom-${building.id}`,
     name: building.name || 'Custom Building',
-    description: `${building.beds}-bed custom design`,
+    description: `${building.beds}-pallet custom design`,
     glbPath: building.publicPath,
     beds: building.beds,
     minAreaM2: m?.groundFloorArea ?? 100,
     metadata: m ? {
-      erBeds: m.erBeds ?? 0,
-      operatingRooms: m.operatingRooms ?? 0,
-      traumaRooms: m.traumaRooms ?? 0,
-      ambulances: m.ambulances ?? 0,
-      rooms: m.rooms ?? 0,
-      doctors: m.doctors ?? 0,
-      nurses: m.nurses ?? 0,
+      distributionCounters: m.distributionCounters ?? 0,
+      coldStorageUnits: m.coldStorageUnits ?? 0,
+      intakeRooms: m.intakeRooms ?? 0,
+      deliveryVans: m.deliveryVans ?? 0,
+      storageRooms: m.storageRooms ?? 0,
+      coordinators: m.coordinators ?? 0,
+      volunteers: m.volunteers ?? 0,
       numberOfFloors: m.numberOfFloors ?? 1,
       totalFloorArea: m.totalFloorArea ?? 0,
       groundFloorArea: m.groundFloorArea ?? 0,
     } : undefined,
   };
 }
-

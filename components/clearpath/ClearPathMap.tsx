@@ -636,7 +636,7 @@ export default function ClearPathMap({
             <>
               {layerVisibility.traffic && <TrafficLayer map={mapInstance} />}
               {layerVisibility.trafficHeat && !selectedBlueprint && (
-                <HospitalTrafficHeatLayer map={mapInstance} hospitals={hospitals} congestion={congestion} simulationResult={simulationResult} proposedLocations={proposedLocations.map((b) => ({ lat: b.lat, lng: b.lng, erBeds: b.blueprint.metadata?.erBeds }))} />
+                <HospitalTrafficHeatLayer map={mapInstance} hospitals={hospitals} congestion={congestion} simulationResult={simulationResult} proposedLocations={proposedLocations.map((b) => ({ lat: b.lat, lng: b.lng, erBeds: Math.round(b.blueprint.beds / 2) }))} />
               )}
               {layerVisibility.heatmap && <CoverageHeatmapLayer key={heatmapKey} map={mapInstance} hospitals={hospitals} congestion={congestion} />}
               {selectedBlueprint && (

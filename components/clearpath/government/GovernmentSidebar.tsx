@@ -69,7 +69,6 @@ export default function GovernmentSidebar({
             lat: b.lat,
             lng: b.lng,
             capacity: b.blueprint.beds,
-            erBeds: b.blueprint.metadata?.erBeds,
           })),
         }),
       });
@@ -125,7 +124,7 @@ export default function GovernmentSidebar({
         </div>
         <div>
           <h2 className="civ-header-title">Planning Console</h2>
-          <p className="civ-header-sub">Simulate ER placement and assess network impact</p>
+          <p className="civ-header-sub">Simulate food bank placement and assess network impact</p>
         </div>
       </div>
 
@@ -175,7 +174,7 @@ export default function GovernmentSidebar({
                   <div key={b.id} className="rounded-lg bg-white/90 border border-sky-100 overflow-hidden p-2 space-y-2">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-[11px] font-medium text-slate-700 truncate">
-                        {b.blueprint.name} ({b.blueprint.beds} beds)
+                        {b.blueprint.name} ({b.blueprint.beds} pallets)
                       </span>
                       <button
                         type="button"
@@ -211,13 +210,13 @@ export default function GovernmentSidebar({
                         {isExpanded && (
                           <div className="rounded-md bg-sky-50/80 border border-sky-100 p-2 space-y-1">
                             <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-[10px]">
-                              <MetaRow label="ER Beds" value={meta.erBeds} />
-                              <MetaRow label="Operating Rooms" value={meta.operatingRooms} />
-                              <MetaRow label="Trauma Rooms" value={meta.traumaRooms} />
-                              <MetaRow label="Rooms" value={meta.rooms} />
-                              <MetaRow label="Doctors" value={meta.doctors} />
-                              <MetaRow label="Nurses" value={meta.nurses} />
-                              <MetaRow label="Ambulances" value={meta.ambulances} />
+                              <MetaRow label="Distribution Counters" value={meta.distributionCounters} />
+                              <MetaRow label="Cold Storage Units" value={meta.coldStorageUnits} />
+                              <MetaRow label="Intake Rooms" value={meta.intakeRooms} />
+                              <MetaRow label="Storage Rooms" value={meta.storageRooms} />
+                              <MetaRow label="Coordinators" value={meta.coordinators} />
+                              <MetaRow label="Volunteers" value={meta.volunteers} />
+                              <MetaRow label="Delivery Vans" value={meta.deliveryVans} />
                               <MetaRow label="Floors" value={meta.numberOfFloors} />
                               <MetaRow label="Floor Area" value={`${meta.totalFloorArea.toLocaleString()} m²`} />
                             </div>

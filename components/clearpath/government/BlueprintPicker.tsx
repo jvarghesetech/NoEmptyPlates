@@ -32,7 +32,7 @@ function BlueprintCard({ bp, isActive, onSelect, onRemove, badge }: { bp: Bluepr
         <span className="flex items-center gap-1.5">
           <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${isActive ? 'bg-sky-600 text-sky-100' : 'bg-sky-50 text-sky-600'
             }`}>
-            {bp.beds} beds
+            {bp.beds} pallets
           </span>
           {onRemove && (
             <button

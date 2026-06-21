@@ -43,6 +43,18 @@ interface Proposal {
   id: string;
 }
 
+// Default capacity for a proposal with no usable capacity data (e.g. a
+// building exported before its parameters were configured). Without this,
+// proposalErBeds resolves to 0 and the diversion math divides by zero,
+// silently producing all-zero deltas and a null result — i.e. the
+// simulation appears to do nothing.
+const MIN_PROPOSAL_ER_BEDS = 10;
+
+function resolveProposalErBeds(p: Proposal): number {
+  const resolved = p.erBeds ?? Math.round(p.capacity / 2);
+  return resolved > 0 ? resolved : MIN_PROPOSAL_ER_BEDS;
+}
+
 // Deterministic Patient Diversion Model
 // When new hospitals are placed, patients divert from existing hospitals.
 // With multiple proposals, diversion is split by distance and capacity.
@@ -99,7 +111,7 @@ export function runSimulation(
         rawDiversion[h.id][p.id] = 0;
         continue;
       }
-      const proposalErBeds = p.erBeds ?? Math.round(p.capacity / 2);
+      const proposalErBeds = resolveProposalErBeds(p);
       const capFactor = proposalErBeds / (proposalErBeds + h.erBeds);
       const rate = BASE_DIVERSION_RATE * decay * capFactor;
       rawDiversion[h.id][p.id] = rate * currentPatients;
@@ -129,7 +141,7 @@ export function runSimulation(
   }
   for (const p of props) {
     const received = simHospitals.reduce((s, h) => s + div1[h.id][p.id], 0);
-    const proposalErBeds = p.erBeds ?? Math.round(p.capacity / 2);
+    const proposalErBeds = resolveProposalErBeds(p);
     const cap = proposalErBeds * 2;
     if (received > cap && received > 0) {
       const scale = cap / received;
@@ -157,7 +169,7 @@ export function runSimulation(
 
   for (const p of props) {
     const received = simHospitals.reduce((s, h) => s + (actualDiversion[h.id][p.id] ?? 0), 0);
-    const proposalErBeds = p.erBeds ?? Math.round(p.capacity / 2);
+    const proposalErBeds = resolveProposalErBeds(p);
     const cap = proposalErBeds * 2;
     proposedAfter[p.id] = Math.min(100, Math.round((received / cap) * 100));
   }
