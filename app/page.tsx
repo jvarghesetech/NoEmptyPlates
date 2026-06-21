@@ -35,9 +35,9 @@ const staggerItem = {
 
 const showcaseFeatures = [
   {
-    label: 'Live Congestion',
-    title: 'Real-time ER occupancy',
-    description: 'Colored circles on every hospital show live congestion. Green means capacity, red means overwhelmed.',
+    label: 'Live Coverage',
+    title: 'Real-time food bank busyness',
+    description: 'Colored circles on every food bank show how busy they are. Green means capacity, red means overwhelmed.',
   },
   {
     label: 'Smart Routing',
@@ -45,9 +45,9 @@ const showcaseFeatures = [
     description: 'Tell us your household size and get routed to the nearest food bank, factoring in drive time and wait time.',
   },
   {
-    label: 'ER Simulation',
-    title: 'Plan new ER placement',
-    description: 'Drop a proposed ER, set capacity, run a Voronoi simulatio. Watch patient flow redistribute across the network.',
+    label: 'Coverage Simulation',
+    title: 'Plan new food bank placement',
+    description: 'Drop a proposed food bank, set capacity, run a coverage simulation. Watch how it serves the surrounding community.',
   },
 ];
 
@@ -182,20 +182,20 @@ export default function Landing() {
 
           <FadeUp delay={0.1}>
             <p className="lp-stmt-small">
-              4.5 hours. That&apos;s the average ER wait in Ontario.
+              Millions of Canadians visit a food bank every month.
             </p>
           </FadeUp>
 
           <FadeUp delay={0.2}>
             <div className="lp-stmt-block">
-              <h2 className="lp-stmt-line">Canada&apos;s ERs are overwhelmed.</h2>
+              <h2 className="lp-stmt-line">Food banks are stretched thin.</h2>
               <h2 className="lp-stmt-line">Data can change that.</h2>
             </div>
           </FadeUp>
 
           <FadeUp delay={0.3}>
             <p className="lp-stmt-sub">
-              Smarter placement. Faster triage. Shorter waits.
+              Smarter placement. Faster routing. Less hunger.
             </p>
           </FadeUp>
 
@@ -272,21 +272,21 @@ export default function Landing() {
       <section className="lp-how-section">
         <FeatureSteps
           title="How FoodBanks.io Works"
-          subtitle="Reducing ER congestion with data and simulation — and helping people find food banks fast."
+          subtitle="Helping planners see food bank coverage, and people find food fast."
           features={[
             {
               step: 'Step 1',
-              title: 'See Every ER at a Glance',
+              title: 'See Every Food Bank at a Glance',
               content:
-                "A live 3D map of Ontario's emergency rooms. Congestion circles show real-time occupancy. Instantly see which ERs are overwhelmed and which have capacity.",
-              image: '/carousel/busy-hospital-corridor-stockcake.jpg',
+                "A live 3D map of food banks near you. Instantly see which locations are close by, how busy they are, and what they offer.",
+              image: '/carousel/food-bank-warehouse-network.jpg',
             },
             {
               step: 'Step 2',
-              title: 'Simulate New ER Placement',
+              title: 'Plan New Food Bank Locations',
               content:
-                'Drop a proposed ER anywhere on the map, set its capacity, and run a Voronoi simulation to see how patient flow redistributes across the network in real time.',
-              image: '/carousel/NewmanRegional-Health2-600x400.jpg',
+                'Drop a proposed food bank anywhere on the map, set its capacity, and run a coverage simulation to see how it serves the surrounding community.',
+              image: '/carousel/food-bank-distribution.jpg',
             },
             {
               step: 'Step 3',
