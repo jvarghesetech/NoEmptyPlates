@@ -148,7 +148,13 @@ export async function searchNearbyFoodBanks(
   );
 
   const result = candidates.slice(0, limit);
-  setCached(cacheKey, result);
+  // Don't cache empty results — an empty result almost always means a
+  // transient Mapbox hiccup (e.g. retrieve calls got rate-limited), and
+  // caching it would lock out every food bank feature for the full TTL
+  // even after Mapbox recovers. Let the next request retry fresh instead.
+  if (result.length > 0) {
+    setCached(cacheKey, result);
+  }
   return result;
 }
 

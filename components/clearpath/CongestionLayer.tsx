@@ -38,6 +38,7 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
       const pct = simulationResult?.after?.[hId] !== undefined
         ? simulationResult.after[hId]
         : (loadMap[hId] ?? 70);
+      const delta = simulationResult?.delta?.[hId] ?? 0;
       return {
         type: 'Feature' as const,
         geometry: {
@@ -47,6 +48,8 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
         properties: {
           name: h.name,
           occupancyPct: pct,
+          delta,
+          deltaLabel: delta < 0 ? `${Math.round(delta)}% load` : '',
           id: h._id ?? h.id,
           erBeds: h.erBeds ?? 0,
           totalBeds: h.totalBeds ?? 0,
@@ -142,6 +145,31 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
       }
     });
 
+    // Floating "-9% load" badge — only shows once a simulation has run and
+    // this food bank actually lost demand to the new location.
+    map.addLayer({
+      id: 'hospital-delta-label',
+      type: 'symbol',
+      source: sourceId,
+      filter: ['<', ['get', 'delta'], 0],
+      layout: {
+        'text-field': ['get', 'deltaLabel'],
+        'text-size': 14,
+        'text-offset': [0, -2.6],
+        'text-anchor': 'bottom',
+        'text-font': ['DIN Pro Bold', 'Arial Unicode MS Bold'],
+        // Don't let basemap POI labels suppress this — it's the whole
+        // point of running a simulation, it needs to always be visible.
+        'text-allow-overlap': true,
+        'text-ignore-placement': true
+      },
+      paint: {
+        'text-color': '#15803d',
+        'text-halo-color': '#ffffff',
+        'text-halo-width': 2.4
+      }
+    });
+
     // --- Click handler: send selected hospital to right-side panel ---
     const handleLayerClick = (e: mapboxgl.MapMouseEvent & mapboxgl.EventData) => {
       if (!e.features || e.features.length === 0) return;
@@ -185,6 +213,7 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
         map.off('click', layerId, handleLayerClick);
         map.off('click', handleMapClick);
         if (map && map.getStyle()) {
+          if (map.getLayer('hospital-delta-label')) map.removeLayer('hospital-delta-label');
           if (map.getLayer('hospital-labels')) map.removeLayer('hospital-labels');
           if (map.getLayer(layerId)) map.removeLayer(layerId);
           if (map.getLayer('hospital-demand-ring')) map.removeLayer('hospital-demand-ring');

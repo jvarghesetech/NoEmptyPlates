@@ -759,11 +759,11 @@ export default function ClearPathMap({
           <div className="mt-4 grid grid-cols-2 gap-3">
             <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-3 text-center">
               <p className="text-4xl font-black text-slate-900">{selectedHospital.erBeds}</p>
-              <p className="text-xs uppercase tracking-widest text-slate-500">ER Beds</p>
+              <p className="text-xs uppercase tracking-widest text-slate-500">Daily Capacity</p>
             </div>
             <div className="rounded-2xl border border-sky-100 bg-sky-50/60 p-3 text-center">
               <p className="text-4xl font-black text-slate-900">{selectedHospital.totalBeds}</p>
-              <p className="text-xs uppercase tracking-widest text-slate-500">Total Beds</p>
+              <p className="text-xs uppercase tracking-widest text-slate-500">Weekly Capacity</p>
             </div>
           </div>
           {selectedHospital.specialties.length > 0 && (
