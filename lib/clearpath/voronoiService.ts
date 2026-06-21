@@ -56,7 +56,7 @@ export function runSimulation(
     const after: Record<string, number> = {};
     const delta: Record<string, number> = {};
     for (const h of hospitals) {
-      const id = h._id.toString();
+      const id = h._id?.toString() ?? h.id;
       const snap = snapshots.find((s: any) => s.hospitalId === id);
       const occ = snap?.occupancyPct ?? 70;
       before[id] = occ;
@@ -73,7 +73,7 @@ export function runSimulation(
 
   const simHospitals: SimHospital[] = [];
   for (const h of hospitals) {
-    const id = h._id.toString();
+    const id = h._id?.toString() ?? h.id;
     const snap = snapshots.find((s: any) => s.hospitalId === id);
     const occ = snap?.occupancyPct ?? 70;
     simHospitals.push({

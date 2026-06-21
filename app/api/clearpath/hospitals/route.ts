@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getDb } from '@/lib/clearpath/mongoClient';
+import { searchNearbyFoodBanks } from '@/lib/clearpath/mapboxFoodBankSearch';
+import { getCityById } from '@/lib/map-3d/cities';
 
 export async function GET(req: NextRequest) {
   const city = req.nextUrl.searchParams.get('city');
+  const cityConfig = city ? getCityById(city.toLowerCase()) : undefined;
+
+  if (!cityConfig) {
+    return NextResponse.json([]);
+  }
+
   try {
-    const db = await getDb();
-    const query = city ? { city: city.toLowerCase() } : {};
-    const hospitals = await db.collection('hospitals')
-      .find(query)
-      .toArray();
-    return NextResponse.json(hospitals);
+    const [lng, lat] = cityConfig.center;
+    const foodBanks = await searchNearbyFoodBanks(lat, lng, { limit: 20 });
+    return NextResponse.json(foodBanks);
   } catch (e) {
-    console.warn('Hospitals API: DB unavailable', e);
+    console.warn('Hospitals API: food bank search failed', e);
     return NextResponse.json([]);
   }
 }

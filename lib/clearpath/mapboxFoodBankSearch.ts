@@ -110,9 +110,10 @@ export async function searchNearbyFoodBanks(
       city: f.properties.context?.place?.name?.toLowerCase() ?? '',
       latitude: poiLat,
       longitude: poiLng,
-      // Repurposed for food banks: totalBeds -> households served/week, erBeds unused
+      // Repurposed for food banks: totalBeds -> households served/week,
+      // erBeds -> daily distribution capacity (drives the coverage simulation)
       totalBeds: 40 + (h % 360),
-      erBeds: 0,
+      erBeds: 10 + (h % 50),
       phone: f.properties.metadata?.phone,
     });
   }

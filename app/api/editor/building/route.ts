@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     await writeFile(glbPath, buffer);
 
     // Save metadata sidecar JSON if present
-    const beds = (metadata as any)?.erBeds ?? (metadata as any)?.totalBeds ?? 50;
+    const beds = (metadata as any)?.totalPallets ?? 50;
     const sidecar = {
       id,
       name,
