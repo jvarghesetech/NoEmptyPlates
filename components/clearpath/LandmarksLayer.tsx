@@ -79,8 +79,14 @@ export default function LandmarksLayer({ map }: LandmarksLayerProps) {
     addLayer();
 
     return () => {
-      if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
-      if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+      try {
+        if (map.getStyle()) {
+          if (map.getLayer(LAYER_ID)) map.removeLayer(LAYER_ID);
+          if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+        }
+      } catch {
+        // Map already removed/destroyed — nothing to clean up
+      }
     };
   }, [map]);
 
