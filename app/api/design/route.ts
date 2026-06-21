@@ -23,26 +23,26 @@ BuildingConfig fields and allowed values:
 - style: "modern" | "classic" | "industrial"
 - notes: optional string with extra notes
 
-Hospital parameters (include ONLY if the user mentions a hospital, clinic, or medical facility):
-- hospitalBeds: integer (total patient beds, e.g. 50-500)
-- hospitalDoctors: integer (number of doctors)
-- hospitalNurses: integer (number of nurses)
-- hospitalRooms: integer (total rooms)
-- hospitalOperatingRooms: integer (surgical operating rooms)
-- hospitalEmergencyBays: integer (emergency department bays)
-- hospitalAmbulances: integer (ambulance count)
-- hospitalTraumaRooms: integer (dedicated trauma rooms)
-- hospitalFloors: integer (floors dedicated to hospital use)
+Food bank parameters (include ONLY if the user mentions a food bank, pantry, or distribution center):
+- foodBankPalletCapacity: integer (total pallet storage positions, e.g. 50-500)
+- foodBankCoordinators: integer (number of coordinators)
+- foodBankVolunteers: integer (number of volunteers)
+- foodBankStorageRooms: integer (total storage rooms)
+- foodBankColdStorageUnits: integer (walk-in fridges/freezers)
+- foodBankDistributionCounters: integer (client distribution counters)
+- foodBankDeliveryVans: integer (delivery van count)
+- foodBankIntakeRooms: integer (dedicated intake/registration rooms)
+- foodBankFloors: integer (floors dedicated to food bank use)
 
 Guidelines:
-- If the user mentions a hospital/clinic, set reasonable hospital parameters based on the size.
-- Small clinic: ~20-50 beds, 5-10 doctors, 15-30 nurses, 1-2 ORs, 4-6 ER bays
-- Medium hospital: ~100-200 beds, 20-40 doctors, 60-120 nurses, 4-8 ORs, 10-20 ER bays
-- Large hospital: ~300-500 beds, 50-100 doctors, 150-300 nurses, 8-15 ORs, 20-40 ER bays
-- Always include ALL non-hospital fields (floors, width, length, etc.) in every response.
-- For hospital buildings, default to flat roof, modern style, glass/concrete texture unless specified.
+- If the user mentions a food bank/pantry, set reasonable parameters based on the size.
+- Small pantry: ~20-50 pallet positions, 2-5 coordinators, 10-25 volunteers, 1-2 cold storage units, 2-4 distribution counters
+- Medium food bank: ~100-200 pallet positions, 5-10 coordinators, 40-80 volunteers, 3-6 cold storage units, 6-12 distribution counters
+- Large distribution center: ~300-500 pallet positions, 15-25 coordinators, 100-200 volunteers, 8-12 cold storage units, 15-25 distribution counters
+- Always include ALL non-food-bank fields (floors, width, length, etc.) in every response.
+- For food bank buildings, default to flat roof, modern style, concrete/glass texture unless specified.
 - The confirmation should be a brief, friendly sentence (under 40 words).
-- For hospitals/clinics, mention key stats in the confirmation (e.g. beds, doctors, floors) so the user hears them back.`;
+- For food banks/pantries, mention key stats in the confirmation (e.g. pallet capacity, volunteers, floors) so the user hears them back.`;
 
 function extractJSON(text: string): string {
   let out = text.trim();

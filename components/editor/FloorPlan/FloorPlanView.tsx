@@ -37,8 +37,8 @@ function OuterWalls({ width, depth, wallColor, opacity = 1 }: { width: number; d
   );
 }
 
-/** Simple 3D ambulance model: box body + red stripe + cab + 4 wheels + light bar */
-function AmbulanceModel({ f }: { f: PlacedFurniture }) {
+/** Simple 3D delivery van model: box body + green stripe + cab + 4 wheels + roof vent */
+function DeliveryVanModel({ f }: { f: PlacedFurniture }) {
   const cx = f.x + f.width / 2;
   const cz = f.z + f.depth / 2;
 
@@ -55,10 +55,10 @@ function AmbulanceModel({ f }: { f: PlacedFurniture }) {
         <boxGeometry args={[bodyW, bodyH, bodyD]} />
         <meshStandardMaterial color="#f8f8f8" />
       </mesh>
-      {/* Red stripe */}
+      {/* Green stripe */}
       <mesh position={[0, bodyH * 0.35 + wheelR * 2, 0]}>
         <boxGeometry args={[bodyW + 0.01, bodyH * 0.18, bodyD + 0.01]} />
-        <meshStandardMaterial color="#ef4444" />
+        <meshStandardMaterial color="#16a34a" />
       </mesh>
       {/* Cab (front section) */}
       <mesh position={[0, bodyH * 0.82 + wheelR * 2, -bodyD * 0.28]}>
@@ -81,22 +81,16 @@ function AmbulanceModel({ f }: { f: PlacedFurniture }) {
           <meshStandardMaterial color="#374151" />
         </mesh>
       ))}
-      {/* Light bar on top */}
-      <mesh position={[0, bodyH + wheelR * 2 + 0.06, -bodyD * 0.18]}>
-        <boxGeometry args={[bodyW * 0.4, 0.07, 0.14]} />
-        <meshStandardMaterial color="#3b82f6" emissive="#1d4ed8" emissiveIntensity={0.3} />
+      {/* Roof vent */}
+      <mesh position={[0, bodyH + wheelR * 2 + 0.04, -bodyD * 0.18]}>
+        <boxGeometry args={[bodyW * 0.3, 0.06, 0.18]} />
+        <meshStandardMaterial color="#d4d4d8" />
       </mesh>
-      {/* Red cross on top */}
-      <group position={[0, bodyH + wheelR * 2 + 0.01, bodyD * 0.15]}>
-        <mesh>
-          <boxGeometry args={[0.3, 0.02, 0.08]} />
-          <meshStandardMaterial color="#ef4444" />
-        </mesh>
-        <mesh>
-          <boxGeometry args={[0.08, 0.02, 0.3]} />
-          <meshStandardMaterial color="#ef4444" />
-        </mesh>
-      </group>
+      {/* Logo panel on side */}
+      <mesh position={[bodyW / 2 + 0.005, bodyH * 0.6 + wheelR * 2, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[bodyD * 0.4, bodyH * 0.22, 0.01]} />
+        <meshStandardMaterial color="#16a34a" />
+      </mesh>
     </group>
   );
 }
@@ -104,9 +98,9 @@ function AmbulanceModel({ f }: { f: PlacedFurniture }) {
 function FurnitureItem({ f, opacity = 1 }: { f: PlacedFurniture; opacity?: number }) {
   const isTransparent = opacity < 1;
 
-  // Render ambulance as special model (skip for ghost floors to keep it simple)
-  if (f.label === 'Ambulance' && !isTransparent) {
-    return <AmbulanceModel f={f} />;
+  // Render delivery van as special model (skip for ghost floors to keep it simple)
+  if (f.label === 'Delivery Van' && !isTransparent) {
+    return <DeliveryVanModel f={f} />;
   }
 
   return (

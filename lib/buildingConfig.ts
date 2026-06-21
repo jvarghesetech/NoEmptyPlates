@@ -10,16 +10,16 @@ export interface BuildingConfig {
   style: 'modern' | 'classic' | 'industrial';
   notes?: string;
 
-  // Hospital parameters
-  hospitalBeds?: number;
-  hospitalDoctors?: number;
-  hospitalNurses?: number;
-  hospitalRooms?: number;
-  hospitalOperatingRooms?: number;
-  hospitalEmergencyBays?: number;
-  hospitalAmbulances?: number;
-  hospitalTraumaRooms?: number;
-  hospitalFloors?: number;
+  // Food bank parameters
+  foodBankPalletCapacity?: number;
+  foodBankCoordinators?: number;
+  foodBankVolunteers?: number;
+  foodBankStorageRooms?: number;
+  foodBankColdStorageUnits?: number;
+  foodBankDistributionCounters?: number;
+  foodBankDeliveryVans?: number;
+  foodBankIntakeRooms?: number;
+  foodBankFloors?: number;
 }
 
 export const defaultBuildingConfig: BuildingConfig = {

@@ -8,11 +8,11 @@ import type { RoomTypeId } from '@/lib/editor/floorplan/roomTypes';
 
 // Color dot for each room type
 const ROOM_TYPE_COLORS: Record<RoomTypeId, string> = {
-  ambulance_bay: '#ef4444',
-  emergency_room: '#f97316',
-  trauma_room: '#dc2626',
-  operating_room: '#3b82f6',
-  patient_room: '#60a5fa',
+  delivery_van_bay: '#ef4444',
+  distribution_room: '#f97316',
+  intake_room: '#dc2626',
+  cold_storage_room: '#3b82f6',
+  storage_room: '#60a5fa',
 };
 
 export function RoomListSidebar() {
@@ -26,7 +26,7 @@ export function RoomListSidebar() {
 
   if (!selectedBuilding || !allocation) return null;
 
-  // Check if any hospital params are set
+  // Check if any food bank params are set
   const hasActivity = ROOM_TYPES.some((rt) => rt.getCount(selectedBuilding.spec) > 0);
   if (!hasActivity) return null;
 

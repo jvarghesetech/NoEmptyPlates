@@ -3,19 +3,19 @@ import { useBuildings } from '@/lib/editor/contexts/BuildingsContext';
 import { TransformForm } from './TransformForm';
 import { DimensionsForm } from './DimensionsForm';
 import { WindowForm } from './WindowForm';
-import { HospitalForm } from './HospitalForm';
+import { FoodBankForm } from './FoodBankForm';
 import { TextureSelector } from './TextureSelector';
 import { BuildingList } from './BuildingList';
 import { DEFAULT_BUILDING_SPEC } from '@/lib/editor/types/buildingSpec';
 
-type SettingsTab = 'transform' | 'dimensions' | 'textures' | 'windows' | 'hospital';
+type SettingsTab = 'transform' | 'dimensions' | 'textures' | 'windows' | 'foodbank';
 
 const TABS: { id: SettingsTab; label: string }[] = [
   { id: 'transform', label: 'Transform' },
   { id: 'dimensions', label: 'Dimensions' },
   { id: 'textures', label: 'Textures' },
   { id: 'windows', label: 'Windows' },
-  { id: 'hospital', label: 'Hospital' },
+  { id: 'foodbank', label: 'Food Bank' },
 ];
 
 export function InputPanel() {
@@ -110,8 +110,8 @@ export function InputPanel() {
               {activeTab === 'windows' && (
                 <WindowForm spec={selectedBuilding.spec} onUpdate={handleUpdate} />
               )}
-              {activeTab === 'hospital' && (
-                <HospitalForm spec={selectedBuilding.spec} onUpdate={handleUpdate} />
+              {activeTab === 'foodbank' && (
+                <FoodBankForm spec={selectedBuilding.spec} onUpdate={handleUpdate} />
               )}
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter.js';
 import * as THREE from 'three';
 import { BuildingSpecification, BuildingExportData, BuildingInstance, MultiBuildingExportData } from '@/lib/editor/types/buildingSpec';
-import { extractHospitalMetadata } from '@/lib/editor/utils/hospitalMetadata';
+import { extractFoodBankMetadata } from '@/lib/editor/utils/foodBankMetadata';
 
 export function exportToGLB(buildingGroup: THREE.Group, filename: string = 'building.glb'): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -287,7 +287,7 @@ function cleanClonedGroup(group: THREE.Group): void {
   });
 }
 
-// Export to Map - sends GLB + hospital metadata to API and returns the building ID
+// Export to Map - sends GLB + food bank metadata to API and returns the building ID
 export async function exportToMap(
   scene: THREE.Scene,
   buildingName: string = 'building',
@@ -470,7 +470,7 @@ export async function exportToMap(
           const formData = new FormData();
           formData.append('glb', new Blob([arrayBuffer], { type: 'model/gltf-binary' }), `${buildingName}.glb`);
 
-          const metadata = extractHospitalMetadata(buildings);
+          const metadata = extractFoodBankMetadata(buildings);
           formData.append('metadata', JSON.stringify(metadata));
           formData.append('name', buildingName);
 

@@ -25,7 +25,7 @@ export function DimensionsForm({ spec, onUpdate, buildingId }: DimensionsFormPro
     const currentZ = currentBuilding.position.z;
     const currentHeight = spec.floorHeight * spec.numberOfFloors;
 
-    let maxAllowed = 150; // Default max (supports hospital-scale buildings)
+    let maxAllowed = 150; // Default max (supports large distribution-center-scale buildings)
 
     for (const other of buildings) {
       if (other.id === buildingId) continue;

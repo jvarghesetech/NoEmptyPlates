@@ -154,7 +154,7 @@ function packFloor(
 /**
  * Generates a complete building allocation across all floors.
  * Fills each floor completely (bottom to top) before moving to the next.
- * Ground-floor-only rooms (ambulance, ER, trauma) are placed on floor 0 first,
+ * Ground-floor-only rooms (delivery van, distribution, intake) are placed on floor 0 first,
  * then remaining space on floor 0 is filled with non-ground rooms before
  * moving up to floor 1, 2, etc.
  */
