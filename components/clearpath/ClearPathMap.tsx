@@ -308,7 +308,7 @@ export default function ClearPathMap({
       const buildingId = b.id;
       marker.on('dragend', () => {
         const lngLat = marker.getLngLat();
-        if (selectedBlueprintRef.current && mapRef.current) {
+        if (selectedBlueprintRef.current && mapRef.current && mapRef.current.getLayer('suitable-parcels-fill')) {
           const pt = mapRef.current.project(lngLat);
           const hits = mapRef.current.queryRenderedFeatures(pt, { layers: ['suitable-parcels-fill'] });
           if (!hits.length) {
