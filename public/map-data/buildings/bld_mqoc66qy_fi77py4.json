@@ -1,0 +1,23 @@
+{
+  "id": "bld_mqoc66qy_fi77py4",
+  "name": "67",
+  "beds": 0,
+  "metadata": {
+    "totalPallets": 0,
+    "distributionCounters": 0,
+    "coldStorageUnits": 0,
+    "intakeRooms": 0,
+    "deliveryVans": 0,
+    "storageRooms": 0,
+    "coordinators": 0,
+    "volunteers": 0,
+    "usablePallets": 0,
+    "usableDistributionCounters": 0,
+    "usableColdStorageUnits": 0,
+    "totalFloorArea": 900,
+    "groundFloorArea": 300,
+    "numberOfFloors": 3,
+    "createdAt": "2026-06-21T22:06:23.124Z"
+  },
+  "createdAt": "2026-06-21T22:06:23.148Z"
+}

@@ -1,30 +1,24 @@
 import { MongoClient } from 'mongodb';
 
-const uri = process.env.MONGODB_URI;
-const options = {};
+// Lazy connection — connecting at module-import time risks crashing any
+// serverless function that happens to bundle this module in a shared
+// chunk (even ones that never call getDb()), if the URI is missing or
+// the network rejects the connection. Only connect when actually asked to.
+let clientPromise: Promise<MongoClient> | null = null;
 
-let client: MongoClient;
-let clientPromise: Promise<MongoClient>;
-
-if (uri) {
-  if (process.env.NODE_ENV === 'development') {
-    if (!(global as any)._mongoClientPromise) {
-      client = new MongoClient(uri, options);
-      (global as any)._mongoClientPromise = client.connect();
-    }
-    clientPromise = (global as any)._mongoClientPromise;
-  } else {
-    client = new MongoClient(uri, options);
+function getClientPromise(): Promise<MongoClient> {
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    return Promise.reject(new Error('MONGODB_URI is not set'));
+  }
+  if (!clientPromise) {
+    const client = new MongoClient(uri, {});
     clientPromise = client.connect();
   }
-} else {
-  clientPromise = Promise.reject(new Error('MONGODB_URI is not set'));
+  return clientPromise;
 }
 
-export default clientPromise;
-
 export async function getDb() {
-  if (!uri) throw new Error('MONGODB_URI is not set');
-  const client = await clientPromise;
+  const client = await getClientPromise();
   return client.db('clearpath');
 }
