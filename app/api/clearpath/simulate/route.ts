@@ -13,14 +13,19 @@ export async function POST(req: NextRequest) {
   }
 
   const [lng, lat] = cityConfig.center;
-  const foodBanks = await searchNearbyFoodBanks(lat, lng, { limit: 20 });
-  const snapshots = foodBanks.map((h) => ({
-    hospitalId: h.id,
-    ...simulateFoodBankWait(h.id),
-  }));
+  try {
+    const foodBanks = await searchNearbyFoodBanks(lat, lng, { limit: 20 });
+    const snapshots = foodBanks.map((h) => ({
+      hospitalId: h.id,
+      ...simulateFoodBankWait(h.id),
+    }));
 
-  const proposals = body.proposals ?? [];
-  const result = runSimulation(foodBanks, snapshots, proposals);
+    const proposals = body.proposals ?? [];
+    const result = runSimulation(foodBanks, snapshots, proposals);
 
-  return NextResponse.json(result);
+    return NextResponse.json(result);
+  } catch (e) {
+    console.warn('Simulate API: food bank search failed', e);
+    return NextResponse.json({ before: {}, after: {}, delta: {} });
+  }
 }

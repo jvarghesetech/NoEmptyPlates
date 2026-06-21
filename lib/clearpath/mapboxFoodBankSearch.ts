@@ -39,6 +39,26 @@ function hashString(s: string): number {
   return Math.abs(h);
 }
 
+// Each call fires up to ~11 Mapbox requests (1 suggest + up to 10 retrieves).
+// Government mode re-fetches on every city change/render, so without caching
+// it's easy to burn through Mapbox's rate limit (429s) within seconds.
+const CACHE_TTL_MS = 5 * 60 * 1000;
+const searchCache = new Map<string, { data: Hospital[]; expiresAt: number }>();
+
+function getCached(key: string): Hospital[] | undefined {
+  const entry = searchCache.get(key);
+  if (!entry) return undefined;
+  if (Date.now() > entry.expiresAt) {
+    searchCache.delete(key);
+    return undefined;
+  }
+  return entry.data;
+}
+
+function setCached(key: string, data: Hospital[]): void {
+  searchCache.set(key, { data, expiresAt: Date.now() + CACHE_TTL_MS });
+}
+
 /**
  * Finds real nearby food banks via Mapbox's text search (no dedicated
  * "food_bank" POI category exists, so this uses suggest+retrieve with a
@@ -53,6 +73,10 @@ export async function searchNearbyFoodBanks(
 ): Promise<Hospital[]> {
   const limit = opts.limit ?? 8;
   const radiusKm = opts.radiusKm ?? 80;
+
+  const cacheKey = `${lat.toFixed(3)},${lng.toFixed(3)}:${limit}:${radiusKm}`;
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
 
   if (!MAPBOX_TOKEN) {
     throw new Error('NEXT_PUBLIC_MAPBOX_TOKEN is not configured');
@@ -123,7 +147,9 @@ export async function searchNearbyFoodBanks(
       haversineKm(lat, lng, a.latitude, a.longitude) - haversineKm(lat, lng, b.latitude, b.longitude)
   );
 
-  return candidates.slice(0, limit);
+  const result = candidates.slice(0, limit);
+  setCached(cacheKey, result);
+  return result;
 }
 
 /** Stable simulated wait so the same food bank doesn't jump around between requests. */
