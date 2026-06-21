@@ -8,8 +8,8 @@ export interface HospitalStatsPanelData {
   id: string;
   name: string;
   occupancyPct: number;
-  erBeds: number;
-  totalBeds: number;
+  waitMinutes: number;
+  foodAvailable: number;
   phone: string;
   specialties: string[];
 }
@@ -53,6 +53,10 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
           id: h._id ?? h.id,
           erBeds: h.erBeds ?? 0,
           totalBeds: h.totalBeds ?? 0,
+          // Stock on hand depletes as occupancy/demand rises — gives a
+          // concrete "how much food is left right now" sense instead of
+          // an abstract bed-style capacity number.
+          foodAvailable: Math.round((h.totalBeds ?? 100) * 20 * (1 - pct / 100)),
           phone: h.phone ?? '',
           specialties: Array.isArray(h.specialties) ? h.specialties.join(', ') : '',
           website: h.website ?? '',
@@ -183,10 +187,10 @@ export default function CongestionLayer({ map, hospitals, congestion, onHospital
 
       onHospitalSelect?.({
         id: String(props.id ?? ''),
-        name: String(props.name ?? 'Hospital'),
+        name: String(props.name ?? 'Food Bank'),
         occupancyPct,
-        erBeds: Number(props.erBeds ?? 0),
-        totalBeds: Number(props.totalBeds ?? 0),
+        waitMinutes: Number(props.waitMinutes ?? 60),
+        foodAvailable: Number(props.foodAvailable ?? 0),
         phone: String(props.phone ?? ''),
         specialties,
       });
