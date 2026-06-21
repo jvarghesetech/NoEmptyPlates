@@ -8,8 +8,15 @@ interface ExportBarProps {
   sceneRef: React.MutableRefObject<THREE.Scene | null>;
 }
 
+// Waits for React to commit a state change and the browser to paint at
+// least one frame, so the THREE scene graph reflects the new state before
+// we read from sceneRef.
+function waitForNextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+}
+
 export function ExportBar({ sceneRef }: ExportBarProps) {
-  const { buildings } = useBuildings();
+  const { buildings, floorPlanFloor, setFloorPlanFloor } = useBuildings();
   const router = useRouter();
   const [exporting, setExporting] = useState(false);
   const [exportingToMap, setExportingToMap] = useState(false);
@@ -23,6 +30,14 @@ export function ExportBar({ sceneRef }: ExportBarProps) {
     }
 
     setExporting(true);
+    // Floor Plan view replaces the building's exterior shell with interior
+    // room furniture in the scene graph — exit it first so the export
+    // captures what the building actually looks like, not its floor plan.
+    const wasInFloorPlan = floorPlanFloor;
+    if (wasInFloorPlan !== null) {
+      setFloorPlanFloor(null);
+      await waitForNextFrame();
+    }
     try {
       await exportMultiBuildingsToGLB(sceneRef.current);
       alert(`Successfully exported ${buildings.length} building${buildings.length > 1 ? 's' : ''} as GLB!`);
@@ -30,6 +45,7 @@ export function ExportBar({ sceneRef }: ExportBarProps) {
       console.error('Export failed:', error);
       alert('Failed to export GLB. Check console for details.');
     } finally {
+      if (wasInFloorPlan !== null) setFloorPlanFloor(wasInFloorPlan);
       setExporting(false);
     }
   };
@@ -63,6 +79,13 @@ export function ExportBar({ sceneRef }: ExportBarProps) {
     const name = buildingName.trim() || 'Custom Building';
 
     setExportingToMap(true);
+    // Same as handleExportGLB: leave Floor Plan view first so we export the
+    // actual building exterior, not its interior room layout.
+    const wasInFloorPlan = floorPlanFloor;
+    if (wasInFloorPlan !== null) {
+      setFloorPlanFloor(null);
+      await waitForNextFrame();
+    }
     try {
       const { id } = await exportToMap(sceneRef.current, name, buildings);
       // Navigate to map with the building ID
@@ -71,6 +94,8 @@ export function ExportBar({ sceneRef }: ExportBarProps) {
       console.error('Export to map failed:', error);
       alert('Failed to export to map. Check console for details.');
       setExportingToMap(false);
+    } finally {
+      if (wasInFloorPlan !== null) setFloorPlanFloor(wasInFloorPlan);
     }
   };
 

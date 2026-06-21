@@ -157,7 +157,7 @@ export async function GET() {
         filename: f,
         publicPath: `/map-data/buildings/${f}`,
         name: (sidecar.name as string) || 'Custom Building',
-        beds: (sidecar.beds as number) || 50,
+        beds: typeof sidecar.beds === 'number' ? sidecar.beds : 50,
         metadata: sidecar.metadata || null,
       });
     }
