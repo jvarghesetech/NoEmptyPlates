@@ -234,8 +234,8 @@ export default function MapPageContent() {
                   </svg>
                 </div>
                 <div>
-                  <h2 className="civ-header-title">ERoute</h2>
-                  <p className="civ-header-sub">Find the right ER for your situation</p>
+                  <h2 className="civ-header-title">FoodBanks.io</h2>
+                  <p className="civ-header-sub">Find a food bank near you</p>
                 </div>
               </div>
               <p className="civ-pick-location-message">

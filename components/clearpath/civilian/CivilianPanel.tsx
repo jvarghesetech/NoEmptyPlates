@@ -2,9 +2,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import VoiceTriage from './VoiceTriage';
+import ChatTriage from './ChatTriage';
 import RoutingResult from './RoutingResult';
-import type { TriageResponse, RouteResponse, ScoredHospital } from '@/lib/clearpath/types';
+import type { IntakeResponse, RouteResponse, ScoredHospital } from '@/lib/clearpath/types';
 
 const API_TIMEOUT_MS = 15_000;
 
@@ -31,7 +31,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
   const [postalCode, setPostalCode] = useState('');
   const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [locating, setLocating] = useState(false);
-  const [triageResult, setTriageResult] = useState<TriageResponse | null>(null);
+  const [intakeResult, setIntakeResult] = useState<IntakeResponse | null>(null);
   const [routeResult, setRouteResult] = useState<RouteResponse | null>(null);
   const [activeRouteId, setActiveRouteId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -93,23 +93,16 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
     );
   }, []);
 
-  // When voice triage is complete, route the patient
-  const handleTriageComplete = useCallback(
-    async (triage: { severity: 'critical' | 'urgent' | 'non-urgent'; reasoning: string; symptoms: { chestPain: boolean; shortnessOfBreath: boolean; fever: boolean; dizziness: boolean; freeText?: string } | null }) => {
-      setTriageResult({ severity: triage.severity, reasoning: triage.reasoning });
+  // When chat intake is complete, route to the nearest food bank
+  const handleIntakeComplete = useCallback(
+    async (intake: { householdSize: number; reasoning: string; freeText?: string | null }) => {
+      setIntakeResult({ householdSize: intake.householdSize, reasoning: intake.reasoning });
       goTo('loading');
       setError(null);
 
       const routeBody: Record<string, unknown> = {
-        severity: triage.severity,
+        householdSize: intake.householdSize,
         city: cityId,
-        symptoms: triage.symptoms || {
-          chestPain: false,
-          shortnessOfBreath: false,
-          fever: false,
-          dizziness: false,
-          freeText: triage.reasoning,
-        },
       };
 
       if (userCoords) {
@@ -136,7 +129,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
         clearTimeout(routeTimeout);
 
         if (!routeRes.ok) {
-          let message = 'No hospitals found nearby. Please try again.';
+          let message = 'No food banks found nearby. Please try again.';
           try {
             const errBody = (await routeRes.json()) as { error?: string };
             if (errBody?.error) message = errBody.error;
@@ -152,12 +145,12 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
           if (json?.recommended && Array.isArray(json?.alternatives) && json?.userLocation) {
             route = json as RouteResponse;
           } else {
-            setError('No hospitals found nearby. Please try again.');
+            setError('No food banks found nearby. Please try again.');
             goTo('conversation');
             return;
           }
         } catch {
-          setError('No hospitals found nearby. Please try again.');
+          setError('No food banks found nearby. Please try again.');
           goTo('conversation');
           return;
         }
@@ -172,7 +165,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
         if (err instanceof Error && err.name === 'AbortError') {
           setError('Request took too long. Please try again.');
         } else {
-          setError('Unable to find hospitals right now. Please try again.');
+          setError('Unable to find food banks right now. Please try again.');
         }
         goTo('conversation');
         console.error(err);
@@ -184,7 +177,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
   const resetFlow = () => {
     setDirection(-1);
     setStep('location');
-    setTriageResult(null);
+    setIntakeResult(null);
     setRouteResult(null);
     setActiveRouteId(null);
     setUserCoords(null);
@@ -216,8 +209,8 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
         <div>
-          <h2 className="civ-header-title">ERoute</h2>
-          <p className="civ-header-sub">Find the right ER for your situation</p>
+          <h2 className="civ-header-title">FoodBanks.io</h2>
+          <p className="civ-header-sub">Find a food bank near you</p>
         </div>
       </div>
 
@@ -283,7 +276,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
                     whileHover={canStart ? { scale: 1.01, y: -1 } : {}}
                     whileTap={canStart ? { scale: 0.98 } : {}}
                   >
-                    Start Triage
+                    Start Chat
                   </motion.button>
                 </div>
               </div>
@@ -292,7 +285,7 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
 
           {step === 'conversation' && (
             <motion.div key="conversation" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
-              <VoiceTriage onTriageComplete={handleTriageComplete} />
+              <ChatTriage onIntakeComplete={handleIntakeComplete} />
             </motion.div>
           )}
 
@@ -304,17 +297,17 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
                   animate={{ rotate: 360 }}
                   transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
                 />
-                <p className="text-sm font-bold text-slate-700 mt-4">Finding the best ER for you...</p>
+                <p className="text-sm font-bold text-slate-700 mt-4">Finding the nearest food bank...</p>
                 <p className="text-xs text-slate-400 mt-1">Computing optimal route with live traffic</p>
               </div>
             </motion.div>
           )}
 
-          {step === 'result' && triageResult && routeResult && (
+          {step === 'result' && intakeResult && routeResult && (
             <motion.div key="result" custom={direction} variants={slideVariants} initial="enter" animate="center" exit="exit" transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}>
               <RoutingResult
-                severity={triageResult.severity}
-                reasoning={triageResult.reasoning}
+                householdSize={intakeResult.householdSize}
+                reasoning={intakeResult.reasoning}
                 recommended={routeResult.recommended}
                 alternatives={routeResult.alternatives}
                 onBack={resetFlow}
@@ -341,8 +334,8 @@ export default function CivilianPanel({ cityId, onRecommendation, currentRecomme
         </div>
         <p className="civ-progress-label">
           {step === 'location' && 'Step 1 of 3 — Location'}
-          {step === 'conversation' && 'Step 2 of 3 — Tell us what happened'}
-          {step === 'loading' && 'Finding your ER...'}
+          {step === 'conversation' && 'Step 2 of 3 — Tell us your household size'}
+          {step === 'loading' && 'Finding your food bank...'}
           {step === 'result' && 'Step 3 of 3 — Result'}
         </p>
       </div>

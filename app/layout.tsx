@@ -16,8 +16,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ERoute",
-  description: "Model ER placement, triage by severity, and route patients. For Ontario healthcare and civilians.",
+  title: "FoodBanks.io",
+  description: "Find the nearest food bank, what to bring, and the fastest route to get there.",
   icons: {
     icon: "logo.png",
   },

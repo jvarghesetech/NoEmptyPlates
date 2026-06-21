@@ -1,6 +1,6 @@
-# ERoute
+# FoodBanks.io
 
-A smart healthcare emergency routing platform for Ontario. ERoute helps both **government planners** optimize ER placement and **patients** find the best hospital based on their medical condition, live traffic, and real-time ER congestion.
+A platform that helps both **government planners** optimize ER placement and **people** find the nearest food bank based on household size, live traffic, and estimated wait time.
 
 ## Features
 

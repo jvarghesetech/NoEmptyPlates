@@ -7,7 +7,6 @@ import { BuildingsProvider } from '@/lib/editor/contexts/BuildingsContext';
 import { InputPanel } from '@/components/editor/InputPanel/InputPanel';
 import { Scene } from '@/components/editor/Viewport/Scene';
 import { ExportBar } from '@/components/editor/Export/ExportBar';
-import { VoiceDesign } from '@/components/editor/InputPanel/VoiceDesign';
 import { RoomListSidebar } from '@/components/editor/FloorPlan/RoomListSidebar';
 import { FloorPlanBackButton } from '@/components/editor/FloorPlan/FloorPlanBackButton';
 
@@ -51,9 +50,6 @@ export default function BuildingEditorApp() {
         {/* Export Bar - Bottom */}
         <ExportBar sceneRef={sceneRef} />
       </div>
-
-      {/* Voice Design - Floating Bottom Left */}
-      <VoiceDesign />
     </BuildingsProvider>
   );
 }

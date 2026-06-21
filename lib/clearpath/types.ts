@@ -66,13 +66,17 @@ export interface TriageResponse {
   reasoning: string;
 }
 
+export interface IntakeResponse {
+  householdSize: number;
+  reasoning: string;
+}
+
 export interface RouteRequest {
   userLat?: number;
   userLng?: number;
   postalCode?: string;
-  severity: 'critical' | 'urgent' | 'non-urgent';
+  householdSize: number;
   city: string;
-  symptoms?: SymptomsPayload;
 }
 
 export interface ScoredHospital {
@@ -83,7 +87,6 @@ export interface ScoredHospital {
   adjustedWaitMinutes: number;
   distanceKm: number;
   occupancyPct: number;
-  specialtyMatch: boolean;
   routeGeometry: any;
   congestionSegments?: string[];
   totalEstimatedMinutes: number;

@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { scoreAndRankHospitals } from '@/lib/clearpath/routingService';
 import { geocodePostalCode } from '@/lib/clearpath/mapboxDirections';
-import { getDb } from '@/lib/clearpath/mongoClient';
+import { searchNearbyFoodBanks, simulateFoodBankWait } from '@/lib/clearpath/mapboxFoodBankSearch';
 import { RouteRequest } from '@/lib/clearpath/types';
 
 export async function POST(req: NextRequest) {
   try {
     const body: RouteRequest = await req.json();
-    const db = await getDb();
 
     // Resolve user location from coordinates or postal code
     let userLat = body.userLat;
@@ -26,28 +25,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const hospitals = await db
-      .collection('hospitals')
-      .find({})
-      .toArray();
-    const snapshots = await db
-      .collection('congestion_snapshots')
-      .find({})
-      .sort({ recordedAt: -1 })
-      .toArray();
+    const foodBanks = await searchNearbyFoodBanks(userLat, userLng);
 
-    const result = await scoreAndRankHospitals(
-      userLat,
-      userLng,
-      body.severity,
-      hospitals,
-      snapshots,
-      body.symptoms
-    );
+    if (!foodBanks.length) {
+      return NextResponse.json(
+        { error: 'No food banks found near your location.' },
+        { status: 404 }
+      );
+    }
+
+    // Wait time/capacity aren't available from any live source, so they're
+    // simulated deterministically per food bank — everything else (name,
+    // address, phone, coordinates, route) is real.
+    const snapshots = foodBanks.map((h) => ({
+      hospitalId: h.id,
+      ...simulateFoodBankWait(h.id),
+    }));
+
+    const result = await scoreAndRankHospitals(userLat, userLng, foodBanks, snapshots);
 
     if (!result) {
       return NextResponse.json(
-        { error: 'No hospitals found for the specified city.' },
+        { error: 'No food banks found for the specified city.' },
         { status: 404 }
       );
     }

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ScoredHospital } from '@/lib/clearpath/types';
 
 interface RoutingResultProps {
-  severity: 'critical' | 'urgent' | 'non-urgent';
+  householdSize: number;
   reasoning: string;
   recommended: ScoredHospital;
   alternatives: ScoredHospital[];
@@ -14,13 +14,7 @@ interface RoutingResultProps {
   activeRouteId?: string | null;
 }
 
-const severityConfig = {
-  critical: { gradient: 'from-red-600 to-red-700', label: 'CRITICAL', ring: 'ring-red-500/20' },
-  urgent: { gradient: 'from-orange-500 to-orange-600', label: 'URGENT', ring: 'ring-orange-500/20' },
-  'non-urgent': { gradient: 'from-emerald-500 to-emerald-600', label: 'NON-URGENT', ring: 'ring-emerald-500/20' },
-};
-
-function HospitalCard({ scored, rank, onShowRoute, isRouteActive }: { scored: ScoredHospital; rank: number; onShowRoute?: (scored: ScoredHospital) => void; isRouteActive?: boolean }) {
+function FoodBankCard({ scored, rank, onShowRoute, isRouteActive }: { scored: ScoredHospital; rank: number; onShowRoute?: (scored: ScoredHospital) => void; isRouteActive?: boolean }) {
   const h = scored.hospital;
   const isTop = rank === 1;
 
@@ -38,7 +32,6 @@ function HospitalCard({ scored, rank, onShowRoute, isRouteActive }: { scored: Sc
             {h.name}
           </p>
         </div>
-        {scored.specialtyMatch && <span className="civ-badge civ-badge--purple">Specialty</span>}
       </div>
 
       <div className="grid grid-cols-3 gap-1.5 mt-2.5">
@@ -57,7 +50,7 @@ function HospitalCard({ scored, rank, onShowRoute, isRouteActive }: { scored: Sc
       <div className="flex items-center gap-2 text-[10px] text-slate-400 mt-2">
         <span>{scored.distanceKm} km</span>
         <span className="text-slate-200">|</span>
-        <span>{scored.occupancyPct}% full</span>
+        <span>{scored.occupancyPct}% busy</span>
       </div>
 
       <p className="text-[11px] text-slate-500 leading-relaxed mt-1.5">{scored.reason}</p>
@@ -95,20 +88,19 @@ function HospitalCard({ scored, rank, onShowRoute, isRouteActive }: { scored: Sc
   );
 }
 
-export default function RoutingResult({ severity, reasoning, recommended, alternatives, onBack, onShowRoute, activeRouteId }: RoutingResultProps) {
+export default function RoutingResult({ householdSize, reasoning, recommended, alternatives, onBack, onShowRoute, activeRouteId }: RoutingResultProps) {
   const [showAlts, setShowAlts] = useState(false);
-  const config = severityConfig[severity];
 
   return (
     <div className="space-y-3.5">
-      {/* Severity badge */}
+      {/* Household size badge */}
       <motion.div
-        className={`bg-gradient-to-br ${config.gradient} rounded-2xl p-4 text-center ring-4 ${config.ring}`}
+        className="bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl p-4 text-center ring-4 ring-sky-500/20"
         initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       >
-        <p className="text-[9px] font-bold text-white/70 uppercase tracking-[0.15em]">Triage Level</p>
-        <p className="text-xl font-black text-white uppercase tracking-tight">{config.label}</p>
+        <p className="text-[9px] font-bold text-white/70 uppercase tracking-[0.15em]">Household Size</p>
+        <p className="text-xl font-black text-white uppercase tracking-tight">{householdSize} {householdSize === 1 ? 'person' : 'people'}</p>
       </motion.div>
 
       {/* Reasoning */}
@@ -121,7 +113,7 @@ export default function RoutingResult({ severity, reasoning, recommended, altern
       </motion.div>
 
       {/* Recommended */}
-      <HospitalCard scored={recommended} rank={1} onShowRoute={onShowRoute} isRouteActive={(recommended.hospital?.id ?? (recommended.hospital as any)?._id) === activeRouteId} />
+      <FoodBankCard scored={recommended} rank={1} onShowRoute={onShowRoute} isRouteActive={(recommended.hospital?.id ?? (recommended.hospital as any)?._id) === activeRouteId} />
 
       {/* Alternatives */}
       {alternatives.length > 0 && (
@@ -150,25 +142,12 @@ export default function RoutingResult({ severity, reasoning, recommended, altern
                 transition={{ duration: 0.35 }}
               >
                 {alternatives.map((alt, i) => (
-                  <HospitalCard key={alt.hospital.id || i} scored={alt} rank={i + 2} onShowRoute={onShowRoute} isRouteActive={(alt.hospital?.id ?? (alt.hospital as any)?._id) === activeRouteId} />
+                  <FoodBankCard key={alt.hospital.id || i} scored={alt} rank={i + 2} onShowRoute={onShowRoute} isRouteActive={(alt.hospital?.id ?? (alt.hospital as any)?._id) === activeRouteId} />
                 ))}
               </motion.div>
             )}
           </AnimatePresence>
         </div>
-      )}
-
-      {/* 911 */}
-      {severity === 'critical' && (
-        <motion.a
-          href="tel:911"
-          className="civ-btn civ-btn--911 w-full text-center justify-center"
-          whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-          Call 911
-        </motion.a>
       )}
 
       {/* Start over */}

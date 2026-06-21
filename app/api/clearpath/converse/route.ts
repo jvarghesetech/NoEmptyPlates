@@ -1,31 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 30;
 
-const SYSTEM_PROMPT = `You are ERoute's emergency intake AI. You triage patients fast so we can route them to the right ER.
+const SYSTEM_PROMPT = `You are FoodBanks.io's intake AI. You help people quickly find the nearest food bank.
 
 Rules:
 1. Ask ONE short question at a time. Max 1-2 sentences per response.
-2. NO filler. No "I'm sorry to hear that", no "That sounds concerning", no "I understand". Jump straight to the next question or action.
-3. If something sounds dangerous, give ONE immediate instruction: "Apply pressure to the wound." / "Sit upright." / "Don't move." / "Call 911 now." Then immediately triage.
-4. Gather: what happened, pain level (1-10), breathing okay?
-5. You MUST complete triage within 2-3 user messages. After the user's 2nd reply you MUST triage on your next response. Do NOT ask more than 3 questions total.
-6. Your FINAL message before triage must say exactly: "Got it. We're routing you to the nearest ER now."
+2. NO filler. No "I'm sorry to hear that", no "That sounds tough". Jump straight to the next question or action.
+3. Gather: roughly how many people in their household need food.
+4. You MUST finish within 1-2 user messages. After the user's 1st reply with a household size, you MUST finalize on your next response. Do NOT ask more than 2 questions total.
+5. Your FINAL message before finalizing must give brief general guidance on what to bring (e.g. "Bring a photo ID and reusable bags if you have them — not always required.") and end with: "Finding the nearest food bank now."
 
 CRITICAL RULES:
 - NEVER output JSON, code blocks, or structured data in your spoken text.
-- When you have enough info (or after 2-3 exchanges — whichever comes first), you MUST add a line at the very end starting with "TRIAGE_RESULT:" followed by triage JSON:
-TRIAGE_RESULT:{"severity": "critical|urgent|non-urgent", "reasoning": "brief explanation", "done": true, "symptoms": {"chestPain": false, "shortnessOfBreath": false, "fever": false, "dizziness": false, "freeText": "summary"}}
-- The TRIAGE_RESULT line is stripped before display — the patient never sees it.
-- If you are unsure, err toward "urgent". NEVER keep chatting to gather more info past 3 exchanges.
+- When you have the household size (or after 2 exchanges — whichever comes first), you MUST add a line at the very end starting with "INTAKE_RESULT:" followed by JSON:
+INTAKE_RESULT:{"householdSize": 1, "reasoning": "brief explanation", "done": true, "freeText": "summary"}
+- The INTAKE_RESULT line is stripped before display — the person never sees it.
+- If household size is unclear, default to 1. NEVER keep chatting past 2 exchanges.
 
-Severity:
-- critical: Life-threatening (severe chest pain, stroke, major trauma, can't breathe, uncontrolled bleeding)
-- urgent: Needs prompt care (moderate-severe pain, high fever, worsening, possible fracture)
-- non-urgent: Can wait (mild stable pain, minor injury, cold/flu)
-
-Be direct. Every word counts. TRIAGE FAST.`;
+Be direct. Every word counts.`;
 
 interface Message {
   role: 'system' | 'user' | 'assistant';
@@ -41,67 +35,67 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'messages array is required' }, { status: 400 });
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      return NextResponse.json({ error: 'OPENAI_API_KEY not configured' }, { status: 500 });
+      return NextResponse.json({ error: 'ANTHROPIC_API_KEY not configured' }, { status: 500 });
     }
 
-    const openai = new OpenAI({ apiKey });
-    const modelId = process.env.OPENAI_MODEL ?? 'gpt-4o-mini';
+    const anthropic = new Anthropic({ apiKey });
+    const modelId = process.env.ANTHROPIC_MODEL ?? 'claude-haiku-4-5-20251001';
 
     const userMessageCount = messages.filter(m => m.role === 'user').length;
 
-    // Hard cutoff: if 5+ user messages, force triage from conversation history
-    if (userMessageCount >= 5) {
+    // Hard cutoff: if 4+ user messages, force completion from conversation history
+    if (userMessageCount >= 4) {
       const conversationSummary = messages
         .filter(m => m.role === 'user')
         .map(m => m.content)
         .join('; ');
       return NextResponse.json({
-        reply: "Got it. We're routing you to the nearest ER now.",
-        triage: {
-          severity: 'urgent' as const,
-          reasoning: `Auto-triaged after extended conversation: ${conversationSummary.slice(0, 200)}`,
-          symptoms: { chestPain: false, shortnessOfBreath: false, fever: false, dizziness: false, freeText: conversationSummary.slice(0, 300) },
+        reply: "Got it. Bring a photo ID and reusable bags if you have them. Finding the nearest food bank now.",
+        intake: {
+          householdSize: 1,
+          reasoning: `Auto-completed after extended conversation: ${conversationSummary.slice(0, 200)}`,
+          freeText: conversationSummary.slice(0, 300),
         },
       });
     }
 
-    const fullMessages: Message[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      ...messages,
-    ];
+    const fullMessages: Array<{ role: 'user' | 'assistant'; content: string }> = messages.map(m => ({
+      role: m.role === 'assistant' ? 'assistant' : 'user',
+      content: m.content,
+    }));
 
-    // After 3 user messages, inject a hard nudge to force triage NOW
-    if (userMessageCount >= 3) {
+    // After 2 user messages, inject a hard nudge to force completion NOW
+    if (userMessageCount >= 2) {
       fullMessages.push({
-        role: 'system',
-        content: 'You have enough information. You MUST triage NOW. Say "Got it. We\'re routing you to the nearest ER now." and include the TRIAGE_RESULT line. Do NOT ask any more questions.',
+        role: 'user',
+        content: '[SYSTEM] You have enough information. You MUST finalize NOW. Give brief what-to-bring guidance, end with "Finding the nearest food bank now." and include the INTAKE_RESULT line. Do NOT ask any more questions.',
       });
     }
 
-    const result = await openai.chat.completions.create({
+    const result = await anthropic.messages.create({
       model: modelId,
+      system: SYSTEM_PROMPT,
       temperature: 0.4,
       max_tokens: 300,
       messages: fullMessages,
     });
 
-    const text = result.choices[0]?.message?.content ?? '';
+    const text = result.content[0]?.type === 'text' ? result.content[0].text : '';
 
-    // Extract triage JSON from the response — greedy match to handle nested braces
-    let triage = null;
+    // Extract intake JSON from the response — greedy match to handle nested braces
+    let intake = null;
 
-    // TRIAGE_RESULT: format — grab everything from the opening { to the end of the string
-    const triageMatch = /TRIAGE_RESULT:\s*(\{[\s\S]*\})\s*$/.exec(text);
-    if (triageMatch) {
+    const intakeMatch = /INTAKE_RESULT:\s*(\{[\s\S]*\})\s*$/.exec(text);
+    if (intakeMatch) {
       try {
-        const parsed = JSON.parse(triageMatch[1].trim());
-        if (parsed.done && parsed.severity && parsed.reasoning) {
-          triage = {
-            severity: parsed.severity,
+        const parsed = JSON.parse(intakeMatch[1].trim());
+        if (parsed.done && parsed.reasoning) {
+          intake = {
+            householdSize: parsed.householdSize ?? 1,
             reasoning: parsed.reasoning,
-            symptoms: parsed.symptoms || null,
+            freeText: parsed.freeText || null,
           };
         }
       } catch {
@@ -109,36 +103,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Legacy ```json format fallback
-    if (!triage) {
-      const jsonMatch = /```json\s*([\s\S]*?)```/.exec(text);
-      if (jsonMatch) {
-        try {
-          const parsed = JSON.parse(jsonMatch[1].trim());
-          if (parsed.done && parsed.severity && parsed.reasoning) {
-            triage = {
-              severity: parsed.severity,
-              reasoning: parsed.reasoning,
-              symptoms: parsed.symptoms || null,
-            };
-          }
-        } catch {
-          // Not valid JSON, ignore
-        }
-      }
-    }
-
     // Clean the display text — strip all machine-readable data so only natural speech remains
-    let displayText = text
-      .replace(/TRIAGE_RESULT:\s*\{[\s\S]*\}\s*$/g, '')     // TRIAGE_RESULT line (greedy)
-      .replace(/```json[\s\S]*?```/g, '')                     // ```json blocks
-      .replace(/\{[^}]*"severity"\s*:[\s\S]*\}/g, '')         // any raw JSON with "severity"
-      .replace(/\{[^}]*"done"\s*:\s*true[\s\S]*\}/g, '')      // any raw JSON with "done": true
+    const displayText = text
+      .replace(/INTAKE_RESULT:\s*\{[\s\S]*\}\s*$/g, '')
+      .replace(/```json[\s\S]*?```/g, '')
+      .replace(/\{[^}]*"householdSize"\s*:[\s\S]*\}/g, '')
+      .replace(/\{[^}]*"done"\s*:\s*true[\s\S]*\}/g, '')
       .trim();
 
     return NextResponse.json({
       reply: displayText,
-      triage,
+      intake,
     });
   } catch (err) {
     console.error('Converse API error:', err);

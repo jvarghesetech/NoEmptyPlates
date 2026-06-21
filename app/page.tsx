@@ -41,8 +41,8 @@ const showcaseFeatures = [
   },
   {
     label: 'Smart Routing',
-    title: 'AI-powered triage & routing',
-    description: 'Enter symptoms, get a severity score, and see the optimal hospital factoring in drive time, wait time, and specialty.',
+    title: 'AI-powered intake & routing',
+    description: 'Tell us your household size and get routed to the nearest food bank, factoring in drive time and wait time.',
   },
   {
     label: 'ER Simulation',
@@ -80,7 +80,7 @@ export default function Landing() {
         >
           <motion.div variants={staggerItem}>
             <Link href="/" className="lp-nav-logo">
-              <img src="/logo.png" alt="ERoute" className="lp-nav-logo-img" />
+              <img src="/logo.png" alt="FoodBanks.io" className="lp-nav-logo-img" />
             </Link>
           </motion.div>
           <motion.div className="lp-nav-divider" variants={staggerItem} />
@@ -105,7 +105,7 @@ export default function Landing() {
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-              Find an ER
+              Find a Food Bank
             </MotionLink>
           </motion.div>
         </motion.div>
@@ -125,7 +125,7 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.9, delay: 0.4, ease }}
           >
-            ERoute.
+            FoodBanks.io.
           </motion.h1>
           <motion.p
             className="lp-hero-subtitle"
@@ -133,7 +133,7 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.7, ease }}
           >
-            Smart ER routing for Ontario
+            Find the nearest food bank, fast
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -224,7 +224,7 @@ export default function Landing() {
                 whileTap={{ scale: 0.96 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 22 }}
               >
-                <span>Find the Nearest ER</span>
+                <span>Find the Nearest Food Bank</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </MotionLink>
             </div>
@@ -249,13 +249,13 @@ export default function Landing() {
               </div>
               <div className="lp-browser-url">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>eroute.ca/map</span>
+                <span>foodbanks.io/map</span>
               </div>
             </div>
             <div className="lp-browser-viewport">
               <iframe
                 src="/map"
-                title="ERoute Map Preview"
+                title="FoodBanks.io Map Preview"
                 className="lp-browser-iframe"
                 loading="lazy"
               />
@@ -271,8 +271,8 @@ export default function Landing() {
       {/* ───── HOW IT WORKS ───── */}
       <section className="lp-how-section">
         <FeatureSteps
-          title="How ERoute Works"
-          subtitle="Reducing ER congestion with data, simulation, and smart routing."
+          title="How FoodBanks.io Works"
+          subtitle="Reducing ER congestion with data and simulation — and helping people find food banks fast."
           features={[
             {
               step: 'Step 1',
@@ -290,10 +290,10 @@ export default function Landing() {
             },
             {
               step: 'Step 3',
-              title: 'Get Routed to the Right ER',
+              title: 'Get Routed to the Nearest Food Bank',
               content:
-                "Answer a few triage questions and get a severity-based recommendation. Nearest hospital for emergencies, least congested for non-urgent visits.",
-              image: '/carousel/istockphoto-600073876-612x612.jpg',
+                "Tell us your household size in a quick chat and get routed to the nearest food bank, with what to bring, their phone number, and the fastest route there.",
+              image: '/carousel/food-bank-sorting-donations.jpg',
             },
           ]}
           autoPlayInterval={4000}
@@ -305,7 +305,7 @@ export default function Landing() {
       <FadeUp>
         <footer className="lp-footer">
           <div className="lp-footer-inner">
-            <span className="lp-footer-brand">ERoute</span>
+            <span className="lp-footer-brand">FoodBanks.io</span>
             <span className="lp-footer-sep">&middot;</span>
             <a href="https://github.com/phintruong/HackCanada" target="_blank" rel="noopener noreferrer">
               Source on GitHub
