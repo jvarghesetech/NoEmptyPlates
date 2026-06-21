@@ -78,7 +78,7 @@ export default function ChatTriage({ onIntakeComplete }: ChatTriageProps) {
   const startConversation = useCallback(() => {
     setStarted(true);
     setError(null);
-    const greeting: Message = { role: 'assistant', content: "FoodBanks.io here. How many people in your household need food?" };
+    const greeting: Message = { role: 'assistant', content: "NoEmptyPlates here. How many people in your household need food?" };
     setMessages([greeting]);
   }, []);
 

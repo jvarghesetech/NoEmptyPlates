@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FoodBanks.io",
+  title: "NoEmptyPlates",
   description: "Find the nearest food bank, what to bring, and the fastest route to get there.",
   icons: {
     icon: "logo.png",

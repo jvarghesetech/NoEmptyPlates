@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 export const maxDuration = 30;
 
-const SYSTEM_PROMPT = `You are FoodBanks.io's intake AI. You help people quickly find the nearest food bank.
+const SYSTEM_PROMPT = `You are NoEmptyPlates's intake AI. You help people quickly find the nearest food bank.
 
 Rules:
 1. Ask ONE short question at a time. Max 1-2 sentences per response.

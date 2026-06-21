@@ -80,7 +80,7 @@ export default function Landing() {
         >
           <motion.div variants={staggerItem}>
             <Link href="/" className="lp-nav-logo">
-              <img src="/logo.png" alt="FoodBanks.io" className="lp-nav-logo-img" />
+              <img src="/logo.png" alt="NoEmptyPlates" className="lp-nav-logo-img" />
             </Link>
           </motion.div>
           <motion.div className="lp-nav-divider" variants={staggerItem} />
@@ -125,7 +125,7 @@ export default function Landing() {
             animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
             transition={{ duration: 0.9, delay: 0.4, ease }}
           >
-            FoodBanks.io.
+            NoEmptyPlates.
           </motion.h1>
           <motion.p
             className="lp-hero-subtitle"
@@ -249,13 +249,13 @@ export default function Landing() {
               </div>
               <div className="lp-browser-url">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>foodbanks.io/map</span>
+                <span>noemptyplates.io/map</span>
               </div>
             </div>
             <div className="lp-browser-viewport">
               <iframe
                 src="/map"
-                title="FoodBanks.io Map Preview"
+                title="NoEmptyPlates Map Preview"
                 className="lp-browser-iframe"
                 loading="lazy"
               />
@@ -271,7 +271,7 @@ export default function Landing() {
       {/* ───── HOW IT WORKS ───── */}
       <section className="lp-how-section">
         <FeatureSteps
-          title="How FoodBanks.io Works"
+          title="How NoEmptyPlates Works"
           subtitle="Helping planners see food bank coverage, and people find food fast."
           features={[
             {
@@ -305,7 +305,7 @@ export default function Landing() {
       <FadeUp>
         <footer className="lp-footer">
           <div className="lp-footer-inner">
-            <span className="lp-footer-brand">FoodBanks.io</span>
+            <span className="lp-footer-brand">NoEmptyPlates</span>
             <span className="lp-footer-sep">&middot;</span>
             <a href="https://github.com/phintruong/HackCanada" target="_blank" rel="noopener noreferrer">
               Source on GitHub

@@ -1,4 +1,4 @@
-# FoodBanks.io
+# NoEmptyPlates
 
 A platform that helps both **government planners** optimize ER placement and **people** find the nearest food bank based on household size, live traffic, and estimated wait time.
 
